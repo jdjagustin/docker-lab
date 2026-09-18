@@ -10,6 +10,32 @@ commands.
 - `app/Dockerfile` — same idea as stage 1, one image for the `web` service.
 - `docker-compose.yml` — defines both services and how they connect.
 
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph host["Your Mac"]
+        client["curl / browser\nlocalhost:8000"]
+    end
+
+    subgraph net["docker-compose network"]
+        web["web container\nFastAPI + Uvicorn\nport 8000"]
+        db[("db container\nPostgreSQL 16\nport 5432")]
+    end
+
+    vol[("db_data\nnamed volume")]
+
+    client -- "HTTP, via -p 8000:8000" --> web
+    web -- "DATABASE_URL=...@db:5432/...\n(service name, not an IP)" --> db
+    db -- "reads / writes" --> vol
+```
+
+Only `web`'s port is published to your Mac (`8000:8000`). `db` has no `ports:`
+entry, so Postgres is reachable only from inside the compose network, by
+service name (`db`) -- never directly from your host. The named volume
+(`db_data`) is what survives a `docker compose down` (see the exercises in
+the root README).
+
 ## docker-compose.yml, section by section
 
 ```yaml
