@@ -13,20 +13,20 @@ commands.
 ## Architecture
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph host["Your Mac"]
-        client["curl / browser\nlocalhost:8000"]
+        client["curl / browser<br/>localhost:8000"]
     end
 
     subgraph net["docker-compose network"]
-        web["web container\nFastAPI + Uvicorn\nport 8000"]
-        db[("db container\nPostgreSQL 16\nport 5432")]
+        web["web container<br/>FastAPI + Uvicorn<br/>port 8000"]
+        db[("db container<br/>PostgreSQL 16<br/>port 5432")]
     end
 
-    vol[("db_data\nnamed volume")]
+    vol[("db_data<br/>named volume")]
 
-    client -- "HTTP, via -p 8000:8000" --> web
-    web -- "DATABASE_URL=...@db:5432/...\n(service name, not an IP)" --> db
+    client -- "HTTP via -p 8000:8000" --> web
+    web -- "DATABASE_URL points to db:5432" --> db
     db -- "reads / writes" --> vol
 ```
 
